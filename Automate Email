@@ -1,0 +1,84 @@
+import win32com.client as win32  
+
+#Send Email function
+def Emailer(text, subject, recipient, attachmentPath):
+     
+    outlook = win32.Dispatch('outlook.application')
+    mail = outlook.CreateItem(0)
+    mail.To = recipient
+    mail.Subject = subject
+    mail.HtmlBody = text
+    if(len(attachmentPath) > 0):
+        mail.Attachments.Add(attachmentPath)
+
+    mail.send
+    outlook.Application.Quit()
+    #mail.Display(True)
+
+#Invoke the Emailer function after setting up the args
+    try:
+        htmlBody= "Set Your HTML Body"
+        subject= "Set your Subject"
+        emailTo = "Test@amazon.com"
+        attachmentFilePath = "path to the attachment file e.g. C:\\Users\\userName\\FolderName\\file.csv"
+
+        Emailer(htmlBody,subject, emailTo, attachmentFilePath)
+        time.sleep(10)   
+    except:
+        print("\n ******************* Error Occured **************** \n")
+
+
+import openpyxl as xl; 
+
+sourceFilename ="path to the source file to read data e.g. C:\\Users\\userName\\FolderName\\file.xlxs"
+attachmentFilePath = "path to the attachment file e.g. C:\\Users\\userName\\FolderName\\file.csv"
+subject = "Subject Default";
+htmlBody = "HTML Body Default";
+
+print("\n ******************* File Loading Starts **************** \n")
+
+wb1 = xl.load_workbook(sourceFilename,data_only=True)
+
+wsOwner = wb1['sheet1']
+
+
+print("\n ******************* Source Workbook Active now **************** \n")
+
+# calculate total number of rows and 
+# columns in source excel file
+mr = wsOwner.max_row
+mc = wsOwner.max_column
+#Start writing from Row 2
+destinationFileCounter = 2
+
+# excel file to destination excel file
+for i in range (2, mr + 1):
+    print("\n ******************* Processing for Iteration # " + str(i) +" **************** \n")
+    
+   #read value forom each rows
+    ownerLogin = wsOwner.cell(row = i, column = 1).value
+    ownerName = wsOwner.cell(row = i, column = 2).value
+    ownerLevel = wsOwner.cell(row = i, column = 3).value
+    EALogin = wsOwner.cell(row = i, column = 12).value
+    EAName = wsOwner.cell(row = i, column = 13).value
+    apolloRisks = wsOwner.cell(row = i, column = 6).value
+    versionSetRisks = wsOwner.cell(row = i, column = 7).value
+    nawsRisks = wsOwner.cell(row = i, column = 8).value
+    TotalRisks = str(wsOwner.cell(row = i, column = 9).value)
+    sendEmailFlag = wsOwner.cell(row = i, column = 20).value
+    attachmentFile = wsOwner.cell(row = i, column = 21).value
+
+    #prepare Email Subject
+    subject = "[Action Required] XYZ Subject+ ownerLogin;
+       
+    #prepare Email Body
+    if ownerLevel > 9:
+       print("\n ******************* initilize L10+  Email Boday **************** \n")
+       emailTo = EALogin + "@amazon.com"
+       htmlBody = "Hello "+EAName+", <br> <br> <b>We need your help bla bla"
+    else:
+       print("\n ******************* initilize L7+  Email Boday **************** \n")
+       emailTo = ownerLogin + "@amazon.com"
+       htmlBody = "Hello "+ownerName+", <br> <br> <b>We need your help bla bla";
+
+  Emailer(htmlBody,subject, emailTo, attachmentFile);
